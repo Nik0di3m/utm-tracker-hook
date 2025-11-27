@@ -1,9 +1,8 @@
 import React from "react";
-import { useUtmTracker } from "./useUtmTracker";
+import { useUtmTracker, UtmTrackerConfig } from "./useUtmTracker";
 
-interface UtmTrackerProviderProps {
+interface UtmTrackerProviderProps extends UtmTrackerConfig {
   children?: React.ReactNode;
-  expiryDays?: number;
 }
 
 /**
@@ -21,13 +20,24 @@ interface UtmTrackerProviderProps {
  *   )
  * }
  * ```
+ *
+ * With custom parameters:
+ * ```tsx
+ * <UtmTrackerProvider
+ *   expiryDays={60}
+ *   customParams={['ref', 'campaign_id', 'affiliate_id']}
+ * >
+ *   {children}
+ * </UtmTrackerProvider>
+ * ```
  */
 export function UtmTrackerProvider({
   children,
-  expiryDays = 30
+  expiryDays = 30,
+  customParams = []
 }: UtmTrackerProviderProps) {
   // Automatically track UTM parameters
-  useUtmTracker(expiryDays);
+  useUtmTracker({ expiryDays, customParams });
 
   return <>{children}</>;
 }

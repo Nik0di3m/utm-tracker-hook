@@ -3,8 +3,32 @@ import Cookies from "js-cookie";
 
 type UtmParams = Record<string, string | null>;
 
-export function useUtmTracker(expiryDays: number = 30) {
+export interface UtmTrackerConfig {
+  expiryDays?: number;
+  customParams?: string[];
+}
+
+const DEFAULT_PARAMS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_term",
+  "utm_content",
+  "gclid",
+  "fbclid",
+];
+
+export function useUtmTracker(config?: UtmTrackerConfig | number) {
   const [utmData, setUtmData] = useState<UtmParams>({});
+
+  // Handle backward compatibility: if config is a number, treat it as expiryDays
+  const normalizedConfig: UtmTrackerConfig =
+    typeof config === "number" ? { expiryDays: config } : config || {};
+
+  const { expiryDays = 30, customParams = [] } = normalizedConfig;
+
+  // Combine default params with custom params
+  const allParams = [...DEFAULT_PARAMS, ...customParams];
 
   useEffect(() => {
     if (typeof window === "undefined") return; // SSR safe
@@ -19,22 +43,18 @@ export function useUtmTracker(expiryDays: number = 30) {
     // Parse UTM params from URL using native URLSearchParams API
     const searchParams = new URLSearchParams(window.location.search);
 
-    const utms: UtmParams = {
-      utm_source: searchParams.get("utm_source"),
-      utm_medium: searchParams.get("utm_medium"),
-      utm_campaign: searchParams.get("utm_campaign"),
-      utm_term: searchParams.get("utm_term"),
-      utm_content: searchParams.get("utm_content"),
-      gclid: searchParams.get("gclid"),
-      fbclid: searchParams.get("fbclid"),
-    };
+    // Build params object dynamically based on allParams
+    const utms: UtmParams = {};
+    allParams.forEach((param) => {
+      utms[param] = searchParams.get(param);
+    });
 
     // Store UTM data in cookies
     Cookies.set("utm_data", JSON.stringify(utms), { expires: expiryDays });
 
     // Update state
     setUtmData(utms);
-  }, [expiryDays]);
+  }, [expiryDays, allParams.join(",")]);
 
   return utmData;
 }

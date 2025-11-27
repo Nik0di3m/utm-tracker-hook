@@ -78,7 +78,31 @@ function App() {
 <UtmTrackerProvider expiryDays={60}>{children}</UtmTrackerProvider>
 ```
 
+#### Track custom parameters
+
+You can track additional custom URL parameters beyond the standard UTM parameters:
+
+```tsx
+<UtmTrackerProvider
+  expiryDays={30}
+  customParams={["ref", "campaign_id", "affiliate_id", "promo_code"]}
+>
+  {children}
+</UtmTrackerProvider>
+```
+
+This will track all standard UTM parameters plus your custom ones. For example, with URL:
+```
+https://yoursite.com?utm_source=google&ref=homepage&promo_code=SUMMER2024
+```
+
+The hook will capture:
+- Standard: `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `gclid`, `fbclid`
+- Custom: `ref`, `campaign_id`, `affiliate_id`, `promo_code`
+
 ### Option 2: Using the hook directly
+
+#### Basic usage
 
 ```tsx
 import { useUtmTracker } from "@nik0di3m/utm-tracker-hook";
@@ -91,15 +115,39 @@ export default function MyComponent() {
 }
 ```
 
+#### With configuration
+
+```tsx
+import { useUtmTracker } from "@nik0di3m/utm-tracker-hook";
+
+export default function MyComponent() {
+  const utmData = useUtmTracker({
+    expiryDays: 60,
+    customParams: ["ref", "affiliate_id"],
+  });
+
+  return <pre>{JSON.stringify(utmData, null, 2)}</pre>;
+}
+```
+
+#### Backward compatible (legacy)
+
+```tsx
+// Still works for backward compatibility
+const utmData = useUtmTracker(60); // expiryDays only
+```
+
 ## ✨ Key Features
 
 - 🎯 **Framework-agnostic** - Works with Next.js, Vite, CRA, and any React app
 - 🍪 **Automatic cookie storage** - UTM parameters stored for 30 days (configurable)
 - 📊 **Comprehensive tracking** - Captures UTM parameters, GCLID, and FBCLID
+- 🎨 **Custom parameters** - Track any additional URL parameters you need
 - 🔒 **SSR-safe** - Works seamlessly with server-side rendering
 - 📦 **Lightweight** - Minimal dependencies (only `js-cookie`)
 - 💪 **TypeScript support** - Fully typed with TypeScript
 - ⚡ **Easy integration** - Drop-in provider component or use the hook directly
+- 🔄 **Backward compatible** - Legacy API still supported
 
 ## 📋 Tracked Parameters
 
