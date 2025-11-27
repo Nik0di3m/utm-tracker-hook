@@ -1,9 +1,9 @@
 {
-  "name": "utm-tracker-hook",
-  "version": "1.0.2",
-  "description": "Custom React Hook for tracking and storing UTM parameters in cookies",
-  "main": "dist/useUtmTracker.js",
-  "types": "dist/useUtmTracker.d.ts",
+  "name": "@nik0di3m/utm-tracker-hook",
+  "version": "1.1.0",
+  "description": "Framework-agnostic React Hook for tracking and storing UTM parameters in cookies. Works with Next.js, Vite, CRA, and any React application.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
     "prepare": "npm run build"
@@ -13,7 +13,11 @@
     "tracking",
     "react",
     "nextjs",
-    "cookies"
+    "vite",
+    "react-hooks",
+    "cookies",
+    "analytics",
+    "marketing"
   ],
   "author": "Nik0di3m",
   "license": "MIT",
@@ -22,16 +26,12 @@
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
-    "@types/react": "^19.0.10",
-    "next": "^15.2.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "@types/react": "^18.0.0",
+    "react": "^18.0.0",
     "typescript": "^5.4.0"
   },
   "peerDependencies": {
-    "next": "^15.0.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0"
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "repository": {
     "type": "git",

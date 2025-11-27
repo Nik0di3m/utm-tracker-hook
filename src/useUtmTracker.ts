@@ -1,13 +1,9 @@
-"use client";
-
-import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
 type UtmParams = Record<string, string | null>;
 
 export function useUtmTracker(expiryDays: number = 30) {
-  const searchParams = useSearchParams();
   const [utmData, setUtmData] = useState<UtmParams>({});
 
   useEffect(() => {
@@ -20,7 +16,9 @@ export function useUtmTracker(expiryDays: number = 30) {
       return;
     }
 
-    // Parse UTM params from URL
+    // Parse UTM params from URL using native URLSearchParams API
+    const searchParams = new URLSearchParams(window.location.search);
+
     const utms: UtmParams = {
       utm_source: searchParams.get("utm_source"),
       utm_medium: searchParams.get("utm_medium"),
@@ -31,12 +29,12 @@ export function useUtmTracker(expiryDays: number = 30) {
       fbclid: searchParams.get("fbclid"),
     };
 
-    // Store UTM data in cookies for 30 days
+    // Store UTM data in cookies
     Cookies.set("utm_data", JSON.stringify(utms), { expires: expiryDays });
 
     // Update state
     setUtmData(utms);
-  }, [searchParams, expiryDays]);
+  }, [expiryDays]);
 
   return utmData;
 }
