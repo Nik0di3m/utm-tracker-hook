@@ -21,11 +21,13 @@ interface UtmTrackerProviderProps extends UtmTrackerConfig {
  * }
  * ```
  *
- * With custom parameters:
+ * With full configuration:
  * ```tsx
  * <UtmTrackerProvider
  *   expiryDays={60}
  *   customParams={['ref', 'campaign_id', 'affiliate_id']}
+ *   allowOverride={true}
+ *   cookieName="my_utm_data"
  * >
  *   {children}
  * </UtmTrackerProvider>
@@ -34,10 +36,12 @@ interface UtmTrackerProviderProps extends UtmTrackerConfig {
 export function UtmTrackerProvider({
   children,
   expiryDays = 30,
-  customParams = []
+  customParams = [],
+  allowOverride = false,
+  cookieName = "utm_tracking_data"
 }: UtmTrackerProviderProps) {
   // Automatically track UTM parameters
-  useUtmTracker({ expiryDays, customParams });
+  useUtmTracker({ expiryDays, customParams, allowOverride, cookieName });
 
   return <>{children}</>;
 }

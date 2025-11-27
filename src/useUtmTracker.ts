@@ -6,6 +6,8 @@ type UtmParams = Record<string, string | null>;
 export interface UtmTrackerConfig {
   expiryDays?: number;
   customParams?: string[];
+  allowOverride?: boolean;
+  cookieName?: string;
 }
 
 const DEFAULT_PARAMS = [
@@ -18,6 +20,8 @@ const DEFAULT_PARAMS = [
   "fbclid",
 ];
 
+const DEFAULT_COOKIE_NAME = "utm_tracking_data";
+
 export function useUtmTracker(config?: UtmTrackerConfig | number) {
   const [utmData, setUtmData] = useState<UtmParams>({});
 
@@ -25,7 +29,12 @@ export function useUtmTracker(config?: UtmTrackerConfig | number) {
   const normalizedConfig: UtmTrackerConfig =
     typeof config === "number" ? { expiryDays: config } : config || {};
 
-  const { expiryDays = 30, customParams = [] } = normalizedConfig;
+  const {
+    expiryDays = 30,
+    customParams = [],
+    allowOverride = false,
+    cookieName = DEFAULT_COOKIE_NAME,
+  } = normalizedConfig;
 
   // Combine default params with custom params
   const allParams = [...DEFAULT_PARAMS, ...customParams];
@@ -34,8 +43,10 @@ export function useUtmTracker(config?: UtmTrackerConfig | number) {
     if (typeof window === "undefined") return; // SSR safe
 
     // Check if UTM data is already stored in cookies
-    const storedUtms = Cookies.get("utm_data");
-    if (storedUtms) {
+    const storedUtms = Cookies.get(cookieName);
+
+    if (storedUtms && !allowOverride) {
+      // If cookie exists and override is not allowed, use stored data
       setUtmData(JSON.parse(storedUtms));
       return;
     }
@@ -49,12 +60,19 @@ export function useUtmTracker(config?: UtmTrackerConfig | number) {
       utms[param] = searchParams.get(param);
     });
 
-    // Store UTM data in cookies
-    Cookies.set("utm_data", JSON.stringify(utms), { expires: expiryDays });
+    // If allowOverride is true or no cookie exists, store new data
+    // Only store if there's at least one non-null parameter
+    const hasAnyParam = allParams.some((param) => utms[param] !== null);
 
-    // Update state
-    setUtmData(utms);
-  }, [expiryDays, allParams.join(",")]);
+    if (hasAnyParam || !storedUtms) {
+      // Store UTM data in cookies
+      Cookies.set(cookieName, JSON.stringify(utms), { expires: expiryDays });
+      setUtmData(utms);
+    } else if (storedUtms) {
+      // No new params but cookie exists, use stored data
+      setUtmData(JSON.parse(storedUtms));
+    }
+  }, [expiryDays, allParams.join(","), allowOverride, cookieName]);
 
   return utmData;
 }

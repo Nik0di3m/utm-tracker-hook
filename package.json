@@ -1,6 +1,6 @@
 {
   "name": "@nik0di3m/utm-tracker-hook",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Framework-agnostic React Hook for tracking and storing UTM parameters in cookies. Works with Next.js, Vite, CRA, and any React application.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

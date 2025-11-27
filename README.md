@@ -91,14 +91,47 @@ You can track additional custom URL parameters beyond the standard UTM parameter
 </UtmTrackerProvider>
 ```
 
-This will track all standard UTM parameters plus your custom ones. For example, with URL:
+#### Allow override existing cookies
+
+By default, the hook implements first-touch attribution (doesn't overwrite existing data). To enable last-touch attribution:
+
+```tsx
+<UtmTrackerProvider allowOverride={true}>
+  {children}
+</UtmTrackerProvider>
+```
+
+#### Custom cookie name
+
+Avoid conflicts by using a custom cookie name:
+
+```tsx
+<UtmTrackerProvider cookieName="my_app_utm_data">
+  {children}
+</UtmTrackerProvider>
+```
+
+#### Full configuration example
+
+```tsx
+<UtmTrackerProvider
+  expiryDays={60}
+  customParams={["ref", "affiliate_id", "promo_code"]}
+  allowOverride={true}
+  cookieName="my_utm_tracking"
+>
+  {children}
+</UtmTrackerProvider>
+```
+
+For URL:
 ```
 https://yoursite.com?utm_source=google&ref=homepage&promo_code=SUMMER2024
 ```
 
 The hook will capture:
 - Standard: `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `gclid`, `fbclid`
-- Custom: `ref`, `campaign_id`, `affiliate_id`, `promo_code`
+- Custom: `ref`, `affiliate_id`, `promo_code`
 
 ### Option 2: Using the hook directly
 
@@ -124,6 +157,8 @@ export default function MyComponent() {
   const utmData = useUtmTracker({
     expiryDays: 60,
     customParams: ["ref", "affiliate_id"],
+    allowOverride: true,
+    cookieName: "my_utm_data"
   });
 
   return <pre>{JSON.stringify(utmData, null, 2)}</pre>;
@@ -136,6 +171,15 @@ export default function MyComponent() {
 // Still works for backward compatibility
 const utmData = useUtmTracker(60); // expiryDays only
 ```
+
+## 📝 Configuration Options
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `expiryDays` | `number` | `30` | Cookie expiration time in days |
+| `customParams` | `string[]` | `[]` | Additional URL parameters to track |
+| `allowOverride` | `boolean` | `false` | Allow overwriting existing cookie data (enables last-touch attribution) |
+| `cookieName` | `string` | `"utm_tracking_data"` | Custom cookie name to avoid conflicts |
 
 ## ✨ Key Features
 
